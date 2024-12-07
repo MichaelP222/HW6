@@ -50,7 +50,7 @@ private:
         /* Post and pre increment and decrement operators*/
         Iterator & operator++() {
             if (this->indx >= m_container->size()) {
-                throw VectorException("out of bounds")
+                throw VectorException("out of bounds");
             }
             ++(this->indx);
             return *this;
@@ -58,16 +58,15 @@ private:
 
         Iterator & operator++(int) {
             if (this->indx >= m_container->size()) {
-                throw VectorException("out of bounds")
+                throw VectorException("out of bounds");
             }
-            Iterator temp = *this;
             ++(this->indx);
-            return temp;
+            return *this;
         }
 
         Iterator & operator--() {
             if (this->indx <= 0) {
-                throw VectorException("out of bounds")
+                throw VectorException("out of bounds");
             }
             --(this->indx);
             return *this;
@@ -75,11 +74,10 @@ private:
 
         Iterator & operator--(int) {
             if (this->indx <= 0) {
-                throw VectorException("out of bounds")
+                throw VectorException("out of bounds");
             }
-            Iterator temp = *this;
             --(this->indx);
-            return temp;
+            return *this;
         }
 
         /* Overloaded += size_t operator */
@@ -101,7 +99,7 @@ private:
         /* Overloaded - operator. The right hand side is a const Iterator& */
         size_t operator-(const Iterator & other) const {
             if (this->m_container != other.m_container) {
-                throw VectorException("iterators point to different containers")
+                throw VectorException("iterators point to different containers");
             }
             if (this->indx >= other.indx) {
                 return this->indx - other.indx;
@@ -112,10 +110,11 @@ private:
 
         /* Overloaded - operator.  The right hand side is a size_t */
         Iterator operator-(size_t offset) const {
+            Iterator temp = *this;
             for (size_t i = 0; i < offset; ++i) {
-                --(this->indx);
+                --temp;
             }
-            return *this;
+            return temp;
         }
 
         /* Overloaded == operator. The right hand side is a const Iterator& */
@@ -166,7 +165,7 @@ private:
             return temp;
         }
 
-    }
+    };
 
     /* Specify your private Vector member fields. There should be three */
     size_t cap;
@@ -185,7 +184,7 @@ public:
 
     /* The begin() function */
     Iterator begin() noexcept {
-        return Iterator(this, 0)
+        return Iterator(this, 0);
     }
 
     /* The const version of begin(). Note: it returns a const T* type */
@@ -204,7 +203,7 @@ public:
 
     /* The end() function */
     Iterator end() noexcept {
-        return Iterator(this, this->siz)
+        return Iterator(this, this->siz);
     }
 
     /* The const version of end(). Note: it returns a const T* */
@@ -263,7 +262,7 @@ public:
     }
 
     /* The push_back function that takes an RValue reference (Type of T&&) */
-    void push_back(T&&) {
+    void push_back(T&& n) {
         if (this->cap == this->siz){
             if (2 * (this->cap) > 1){
                 this->cap *= 2;
@@ -287,7 +286,7 @@ public:
     /* The pop_back() function*/
     void pop_back() {
         if (this->siz == 0){
-            throw VectorException("popping from empty")
+            throw VectorException("popping from empty");
         }
         (this->buffer)[this->siz].~T();
     }
@@ -332,7 +331,7 @@ public:
     void erase(Iterator start, Iterator end) {
         if (start == end) {return;}
         while(end != this->end()){
-            this->buffer[start.indx] = this->buffer[end.indx];
+            *start = *end;
             start++;
             end++;
         }
@@ -415,7 +414,7 @@ public:
     /* at() function. */
     T & at(size_t index) {
         if (this->siz <= index){
-            throw VectorException("out of bounds")
+            throw VectorException("out of bounds");
         }
         return this->buffer[index];
     }
@@ -423,7 +422,7 @@ public:
     /* const version of at() */
     T const & at(size_t index) const {
         if (this->siz <= index){
-            throw VectorException("out of bounds")
+            throw VectorException("out of bounds");
         }
         return this->buffer[index];
     }
@@ -454,7 +453,7 @@ public:
         this->siz = new_capacity;
         T* newbuffer = new T[new_capacity];
         for (size_t i = 0; i < (this->siz); i++){
-            newbuffer[i] = std::move((this->buffer)[i])
+            newbuffer[i] = std::move((this->buffer)[i]);
         }
 
         delete[] this->buffer;
@@ -489,9 +488,9 @@ public:
             return *this;
         }
         delete[] buffer;
-        capacity = other.cap;
-        size = other.siz;
-        buffer = other.buffer;
+        this->cap = other.cap;
+        this->siz = other.siz;
+        this->buffer = other.buffer;
         other.cap = 0;
         other.siz = 0;
         other.buffer = nullptr;
@@ -502,7 +501,7 @@ public:
     ~Vector() noexcept {
         delete[] buffer;
     }
-}
+};
 /* 
 And we are finished with this header file! 
 If you used an #ifndef #define, what should you add at the very end?
