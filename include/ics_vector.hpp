@@ -15,9 +15,6 @@ Some functions may throw exceptions while others are noexcept.
 Which include directives should you put here?
 (hint: we may throw VectorExceptions. We also want to use ostream)
 */
-#include <stdexcept>
-#include <ostream>
-#include <utility>
 #include "vector_exception.hpp"
 #include <iosfwd>
 
@@ -52,38 +49,40 @@ private:
             if (this->indx >= m_container->size()) {
                 throw VectorException("out of bounds");
             }
-            ++(this->indx);
+            (this->indx)++;
             return *this;
         }
 
-        Iterator & operator++(int) {
+        Iterator operator++(int) {
             if (this->indx >= m_container->size()) {
                 throw VectorException("out of bounds");
             }
-            ++(this->indx);
-            return *this;
+            Iterator temp = *this;
+            this->indx++;
+            return temp;
         }
 
         Iterator & operator--() {
-            if (this->indx <= 0) {
+            if (this->indx == 0) {
                 throw VectorException("out of bounds");
             }
             --(this->indx);
             return *this;
         }
 
-        Iterator & operator--(int) {
-            if (this->indx <= 0) {
+        Iterator operator--(int) {
+            if (this->indx == 0) {
                 throw VectorException("out of bounds");
             }
-            --(this->indx);
-            return *this;
+            Iterator temp = *this;
+            this->indx--;
+            return temp;
         }
 
         /* Overloaded += size_t operator */
         Iterator & operator+=(size_t n) {
             for (size_t i = 0; i < n; ++i){
-                ++(this->indx);
+                ++(*this);
             }
             return *this;
         }
@@ -129,7 +128,7 @@ private:
 
         /* Overloaded star (*) operator to dereference. This returns a T& */
         T & operator*() const {
-            if (this->indx >= m_container->size() || (this->indx) < 0){
+            if (this->indx >= m_container->size()){
                 throw VectorException("out of bounds");
             }
             return (*m_container)[this->indx];
@@ -137,7 +136,7 @@ private:
 
         /* Overloaded -> operator. This returns a T* */
         T * operator->() const {
-            if (this->indx >= m_container->size() || (this->indx) < 0){
+            if (this->indx >= m_container->size()){
                 throw VectorException("out of bounds");
             }
             return &((*m_container)[this->indx]);
@@ -288,6 +287,7 @@ public:
         if (this->siz == 0){
             throw VectorException("popping from empty");
         }
+        this->siz--;
         (this->buffer)[this->siz].~T();
     }
 
